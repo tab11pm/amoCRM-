@@ -13,16 +13,16 @@
   </head>
 	</head>
 	<body>
-		<div class="container p-2 flex justify-center items-center flex-col">
+		<div class="container">
 			<h2>Transaction Table</h2>
 			<table id="transactionTable" class='table'>
 				<thead>
 					<tr>
 						<th class='col table-primary'>ID</th>
-						<th class='col table-primary'>Card Number</th>
-						<th class='col table-primary'>Amount</th>
-						<th class='col table-primary'>Fullname</th>
-						<th class='col table-primary'>Phone</th>
+						<th class='col table-primary'> Название сделки</th>
+						<th class='col table-primary'>Бюджет</th>
+						<th class='col table-primary'>Контакт</th>
+						<th class='col table-primary'>Номер телефона</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -39,6 +39,15 @@
 					<span class="visually-hidden">Loading...</span>
 				 </div>
 			</div>
+		</div>
+		<div class="error">
+			<div class="flex">
+				<!-- <div class="error-icon"> -->
+					<img src="./imgs/err.svg" alt="">
+				<!-- </div> -->
+				<span class='error-header'>Error</span>
+			</div>
+			<div class="error-message"></div>
 		</div>
 
 	</body>

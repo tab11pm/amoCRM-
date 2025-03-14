@@ -2,6 +2,7 @@ import api from './api/index.js'
 import amocrm from './consts/index.js'
 import utilsFunc from './utils/index.js'
 
+const table = document.querySelector('#transactionTable  tbody')
 const loader = document.querySelector('.loader')
 
 const postData = {
@@ -18,7 +19,7 @@ async function main() {
 	let deals = []
 	let contacts = []
 
-	const accessToken = utilsFunc.getCookie('token')
+	const accessToken = utilsFunc.getCookie('access_token')
 	const refreshToken = utilsFunc.getCookie('refresh_token')
 	if (!accessToken && refreshToken) {
 		await api.refreshAccessToken(
@@ -29,20 +30,23 @@ async function main() {
 		)
 	}
 	if (!accessToken && !refreshToken) {
-		api.getAccessToken(postData, postURL, utilsFunc.deleteCookie)
+		api.getAccessToken(postData, postURL, amocrm.authorizationCode, utilsFunc)
 	}
-	if (utilsFunc.getCookie('token')) {
-		//? id, название сделки, бюджет, название контакта и номер телефона.
-		// const deals = await api.getDeals(utilsFunc.getCookie('token'), corsURL)
+	if (utilsFunc.getCookie('access_token')) {
 		do {
 			const fetchingContacts = await api.getContacts(
-				utilsFunc.getCookie('token'),
+				utilsFunc.getCookie('access_token'),
 				corsURL,
 				page,
 				limit
 			)
 			const fetchedDeals = await api.getDeals(accessToken, corsURL, page, limit)
-			if (fetchedDeals && fetchedDeals.length > 0) {
+			if (
+				fetchedDeals &&
+				fetchedDeals.length > 0 &&
+				fetchingContacts &&
+				fetchingContacts.length > 0
+			) {
 				loader.classList.remove('hidden')
 				deals = deals.concat(fetchedDeals)
 				contacts = contacts.concat(fetchingContacts)
@@ -57,7 +61,6 @@ async function main() {
 
 		console.log('Список сделок:', deals)
 		console.log('Список контактов:', contacts)
-		const table = document.querySelector('#transactionTable  tbody')
 		utilsFunc.setDataToTable(table, deals, contacts)
 	}
 }
@@ -100,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		try {
 			// Запрос к API для получения подробностей сделки
 			const response = await api.getDealID(
-				utilsFunc.getCookie('token'),
+				utilsFunc.getCookie('access_token'),
 				corsURL,
 				dealId
 			)

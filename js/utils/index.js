@@ -31,14 +31,12 @@ const utilsFunc = {
 							let content = ''
 							const find =
 								contacts.find(
-									contact => contact.account_id === item.account_id
+									contact => contact.created_at === item.created_at
 								) || ''
 							if (key === 'contact') {
-								content = find.name
+								content = find.name ? find.name : ''
 							} else if (key === 'custom_fields_values') {
-								// content = find[key][0]?.values[0]?.value
-
-								content = find[key][0].values[0].value
+								content = find[key] ? find[key][0]?.values[0]?.value : ''
 							} else {
 								content = item[key]
 							}
@@ -52,18 +50,6 @@ const utilsFunc = {
 	},
 	delay: function (ms) {
 		return new Promise(resolve => setTimeout(resolve, ms))
-	},
-	processDealsWithRateLimit: async function (deals) {
-		for (let i = 0; i < deals.length; i++) {
-			const deal = deals[i]
-			console.log(`Обработка сделки ID: ${deal.id}, Название: ${deal.name}`)
-			// Здесь можно добавить дополнительную обработку каждой сделки
-
-			// После каждого второго запроса делаем паузу в 1 секунду
-			if ((i + 1) % 2 === 0) {
-				await this.delay(1000)
-			}
-		}
 	},
 	// Функция для создания индикатора загрузки
 	createLoadingIndicator: function () {
@@ -96,7 +82,7 @@ const utilsFunc = {
 	formatDate: function (timestamp) {
 		const date = new Date(timestamp * 1000)
 		const day = String(date.getDate()).padStart(2, '0')
-		const month = String(date.getMonth() + 1).padStart(2, '0') // Месяцы в JavaScript отсчитываются с 0
+		const month = String(date.getMonth() + 1).padStart(2, '0')
 		const year = date.getFullYear()
 		const hours = String(date.getHours()).padStart(2, '0')
 		const minutes = String(date.getMinutes()).padStart(2, '0')
@@ -106,7 +92,11 @@ const utilsFunc = {
 	// Функция для определения цвета статуса задачи
 	getStatusColor: function (taskDate) {
 		const today = new Date()
-		const task = new Date(taskDate).toLocaleDateString('en-US')
+		today.setHours(0, 0, 0, 0) // Обнуляем время
+
+		const task = new Date(taskDate * 1000) // Если в секундах, умножаем на 1000
+		task.setHours(0, 0, 0, 0) // Обнуляем время
+
 		const timeDiff = task - today
 		const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
 

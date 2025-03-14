@@ -97,6 +97,43 @@ th {
 	background: #00000054;
 }
 
+.error {
+	--color: #e60000;
+	position: absolute;
+	top: 15px;
+	right: -500px;
+	width: 300px;
+	background: white;
+	box-shadow: 0 0 8px 4px var(--color);
+	border-radius: 8px;
+	transition: right 0.7s ease;
+	padding: 5px 10px;
+
+	.error-header {
+		color: var(--color);
+	}
+
+	.error-icon {
+		width: 16px;
+		height: 16px;
+
+		& img {
+			width: 100%;
+			height: 100%;
+		}
+	}
+}
+
+.error.show {
+	right: 10px;
+}
+
+.flex {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	padding: 5px;
+}
 .hidden {
 	display: none;
 }

@@ -1,4 +1,13 @@
+const errorToast = document.querySelector('.error')
 const api = {
+	addErr: error => {
+		errorToast.querySelector('.error-message').textContent =
+			error || 'server error'
+		errorToast.classList.add('show')
+		setTimeout(() => {
+			errorToast.classList.remove('show')
+		}, 3000)
+	},
 	refreshAccessToken: async function (
 		refreshToken,
 		postData,
@@ -21,22 +30,30 @@ const api = {
 			})
 
 			if (!response.ok) {
-				utilsFunc.deleteCookie('token')
+				utilsFunc.deleteCookie('access_token')
 				utilsFunc.deleteCookie('refresh_token')
+				this.addErr(response.statusText)
 				throw new Error(`Ошибка обновления токена: ${response.statusText}`)
 			}
 
 			const tokens = await response.json()
 			// Сохраните новые access_token и refresh_token для дальнейшего использования
 			console.log('Новый access_token:', tokens.access_token)
-			document.cookie = `token=${tokens.access_token}`
+			document.cookie = `access_token=${tokens.access_token}`
 			document.cookie = `refresh_token=${tokens.refresh_token}`
 		} catch (error) {
 			console.error('Ошибка при обновлении access_token:', error)
+			utilsFunc.deleteCookie('access_token')
+			utilsFunc.deleteCookie('refresh_token')
 		}
 	},
 
-	getAccessToken: async function (postData, postURL) {
+	getAccessToken: async function (
+		postData,
+		postURL,
+		authorizationCode,
+		utilsFunc
+	) {
 		const data = {
 			...postData,
 			code: authorizationCode,
@@ -53,14 +70,18 @@ const api = {
 			})
 
 			if (!response.ok) {
-				utilsFunc.deleteCookie('token')
+				utilsFunc.deleteCookie('access_token')
+
+				this.addErr(response.statusText)
+
 				throw new Error(`Ошибка авторизации: ${response.statusText}`)
 			}
 
 			const tokens = await response.json()
-			document.cookie = `token=${tokens.access_token}`
+			document.cookie = `access_token=${tokens.access_token}`
 			document.cookie = `refresh_token=${tokens.refresh_token}`
 		} catch (error) {
+			utilsFunc.deleteCookie('access_token')
 			console.error('Ошибка при получении access_token:', error)
 		}
 	},
@@ -78,7 +99,8 @@ const api = {
 			})
 
 			if (!response.ok) {
-				utilsFunc.deleteCookie('token')
+				this.addErr(response.statusText)
+				utilsFunc.deleteCookie('access_token')
 				throw new Error(`Ошибка получения сделок: ${response.statusText}`)
 			}
 
@@ -101,7 +123,8 @@ const api = {
 			})
 
 			if (!response.ok) {
-				utilsFunc.deleteCookie('token')
+				utilsFunc.deleteCookie('access_token')
+				this.addErr(response.statusText)
 				throw new Error(`Ошибка получения сделок: ${response.statusText}`)
 			}
 
@@ -125,7 +148,8 @@ const api = {
 			})
 
 			if (!response.ok) {
-				utilsFunc.deleteCookie('token')
+				this.addErr(response.statusText)
+				utilsFunc.deleteCookie('access_token')
 				throw new Error(`Ошибка получения сделок: ${response.statusText}`)
 			}
 
@@ -149,7 +173,8 @@ const api = {
 			})
 
 			if (!response.ok) {
-				utilsFunc.deleteCookie('token')
+				this.addErr(response.status)
+				utilsFunc.deleteCookie('access_token')
 				throw new Error(`Ошибка получения сделок: ${response.statusText}`)
 			}
 
